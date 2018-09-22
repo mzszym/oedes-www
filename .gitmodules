@@ -1,0 +1,6 @@
+[submodule "m.css"]
+	path = m.css
+	url = git://github.com/mosra/m.css
+[submodule "oedes"]
+	path = oedes
+	url = https://github.com/mzszym/oedes
