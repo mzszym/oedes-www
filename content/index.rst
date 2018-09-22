@@ -20,7 +20,7 @@ oedes
 
         .. container:: m-col-l-6 m-push-l-1 m-col-m-7 m-nopadt
 
-            *Open-source simulator for emerging electronic devices*
+            *Open-source electronic device simulator*
 
             `oedes` is a device simulator intended for education, and for research on organic, Perovskite, and electrochemical electronic devices. It is applicable to solar cells, light-emitting devices, and sensors. It free to use, and requires only Python with scientific stack installed.
 
