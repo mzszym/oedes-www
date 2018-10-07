@@ -8,6 +8,7 @@ from pelican.utils import truncate_html_words
 import string
 import re
 import os
+from m.htmlsanity import SaneHtmlWriter, render_rst, _SaneFieldBodyTranslator
 
 def fixrst(text):
     math=re.compile(r'\$(.*?)\$')
@@ -74,37 +75,49 @@ class NotebookReader(BaseReader):
 
     file_extensions = ['ipynb']
 
-    def read(self, filename):
+    def _publisher(self):
+        extra_params = {'initial_header_level': '2',
+                        'syntax_highlight': 'short',
+                        'input_encoding': 'utf-8',
+                        #'language_code': settings['DEFAULT_LANG'],
+                        'exit_status_level': 2,
+                        'embed_stylesheet': False}
+        #if settings['DOCUTILS_SETTINGS']:
+        #    extra_params.update(settings['DOCUTILS_SETTINGS'])
+        pub = docutils.core.Publisher(
+            writer=SaneHtmlWriter(),
+            source_class=docutils.io.StringInput,
+            destination_class=docutils.io.StringOutput)
+        pub.set_components('standalone', 'restructuredtext', 'html')
+        pub.writer.translator_class = _SaneFieldBodyTranslator
+        pub.process_programmatic_settings(None, extra_params, None)
+        return pub
+
+    def _render_rst(self, value):
+        publisher = self._publisher()
+        publisher.set_source(source=value)
+        publisher.publish(enable_exit_status=False)
+        return publisher.writer.parts
+
+    def _read(self, filename):
         if filename.find('.ipynb_checkpoints')>0:
             raise ValueError('not processing %s'%filename)
         with open(filename,'rb') as f: 
             rst,summary=nb2rst(f.read())
-
-        extra_params = {'initial_header_level': '2',
-                        'syntax_highlight': 'short',
-                        'input_encoding': 'utf-8',
-                        'exit_status_level': 2,
-                        'embed_stylesheet': False}
-        user_params = self.settings.get('DOCUTILS_SETTINGS')
-        if user_params:
-            extra_params.update(user_params)
-
-        #pub = docutils.core.Publisher(
-        #    writer=Writer(), #TODO?
-        #    source_class=docutils.io.StringInput,
-        #    destination_class=docutils.io.StringOutput)
-        #pub.set_components('standalone', 'restructuredtext', 'html')
-        #pub.process_programmatic_settings(None, extra_params, None)
-        #pub.set_source(source=rst)
-        #pub.publish(enable_exit_status=True)
-
-        #parts = pub.writer.parts
-        
-        parts = docutils.core.publish_parts(rst, writer_name='html')
+        parts = self._render_rst(rst)
+        body = parts['body'].strip()
         if summary is not None:
-            summary = docutils.core.publish_parts(summary, writer_name='html')['body']
+            summary = self._render_rst(summary)['body']
         meta=dict(category='examples',title=parts['title'],date='2017-11-01',summary=summary,slug=os.path.splitext(os.path.split(filename)[1])[0])
-        return parts['body'], dict((k,self.process_metadata(k,meta[k])) for k in meta)
+        return body, dict((k,self.process_metadata(k,meta[k])) for k in meta)
+
+    def read(self, filename):
+        try:
+            return self._read(filename)
+        except:
+            import traceback
+            traceback.print_exc()
+            raise
 
 def add_reader(readers):
     readers.reader_classes['ipynb'] = NotebookReader
