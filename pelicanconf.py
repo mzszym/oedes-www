@@ -51,7 +51,7 @@ M_FINE_PRINT = """
 
 DEFAULT_PAGINATION = 10
 
-STATIC_PATHS = ['static']
+STATIC_PATHS = ['static', 'fonts']
 #EXTRA_PATH_METADATA = {'static/favicon.ico': {'path': 'favicon.ico'}}
 
 PLUGIN_PATHS = [ 'plugins', 'm.css/pelican-plugins' ]
@@ -75,7 +75,7 @@ PLUGINS = ['ipynb',
 THEME = 'm.css/pelican-theme'
 THEME_STATIC_DIR = 'static'
 M_THEME_COLOR = '#22272e'
-M_CSS_FILES = ['https://fonts.googleapis.com/css?family=Source+Code+Pro:400,400i,600%7CSource+Sans+Pro:400,400i,600,600i&subset=latin-ext',
+M_CSS_FILES = [#'https://fonts.googleapis.com/css?family=Source+Code+Pro:400,400i,600%7CSource+Sans+Pro:400,400i,600,600i&subset=latin-ext',
                'static/m-dark.css',
               ]
 

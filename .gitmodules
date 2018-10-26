@@ -4,3 +4,6 @@
 [submodule "oedes"]
 	path = oedes
 	url = https://github.com/mzszym/oedes
+[submodule "google-font-download"]
+	path = google-font-download
+	url = https://github.com/neverpanic/google-font-download
